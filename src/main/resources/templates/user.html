@@ -2,31 +2,39 @@
 <html lang="it" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Area Utente</title>
+    <title>Noleggio Auto</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
 <header>
-    <h2>Area Utente</h2>
+    <h2>🚗 Area Utente</h2>
     <form th:action="@{/logout}" method="post">
-        <button>Logout</button>
+        <button style="background: #ef4444;">Logout</button>
     </form>
 </header>
 
 <main>
-    <div class="card" th:each="car : ${cars}">
-        <h4 th:text="${car.brand + ' ' + car.model}"></h4>
-        <p>€<span th:text="${car.pricePerDay}"></span> / giorno</p>
+    <h3 style="margin-bottom: 20px;">Auto Disponibili</h3>
 
-        <form th:action="@{/rent}" method="post">
-            <input type="hidden" name="carId" th:value="${car.id}">
-            <input type="hidden" name="customerName" value="Mario Rossi">
-            <input type="number" name="days" value="1" min="1">
-            <button>Noleggia</button>
-        </form>
+    <div class="grid">
+        <div class="card" th:each="car : ${cars}">
+            <h3 th:text="${car.brand}">Brand</h3>
+            <h4 th:text="${car.model}" style="color: #666; font-weight: normal;">Modello</h4>
+
+            <p class="price">€<span th:text="${car.pricePerDay}">50</span> <span style="font-size: 0.8rem; color: #666;">/ giorno</span></p>
+
+            <form th:action="@{/rent}" method="post" style="margin-top: 15px;">
+                <input type="hidden" name="carId" th:value="${car.id}">
+                <input type="hidden" name="customerName" value="Mario Rossi">
+
+                <label style="font-size: 0.85rem; color: #555;">Giorni:</label>
+                <input type="number" name="days" value="1" min="1" max="30">
+
+                <button style="width: 100%; margin-top: 10px;">Prenota Ora</button>
+            </form>
+        </div>
     </div>
-
 </main>
 
 </body>

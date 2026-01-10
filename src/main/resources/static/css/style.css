@@ -1,75 +1,133 @@
+/* Reset e Font */
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f4;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
 }
 
+/* Navbar */
 header {
-    background-color: #1f2937;
+    background-color: #1a202c;
     color: white;
-    padding: 15px 30px;
+    padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+header h2 {
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Layout Generale */
 main {
-    padding: 30px;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-h1, h2, h3 {
-    margin-top: 0;
+/* Form e Input */
+input[type="text"], input[type="password"], input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
 
+/* Bottoni */
 button {
     background-color: #2563eb;
     color: white;
     border: none;
-    padding: 8px 14px;
+    padding: 10px 20px;
     border-radius: 6px;
     cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
 }
 
 button:hover {
     background-color: #1d4ed8;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-}
-
-th, td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-}
-
-.grid {
+/* LOGIN: Centratura perfetta */
+.login-container {
     display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-box {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-box h1 { margin-bottom: 1.5rem; color: #1a202c; }
+
+/* UTENTE: Griglia Auto */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
-    flex-wrap: wrap;
 }
 
 .card {
     background: white;
     padding: 20px;
-    border-radius: 10px;
-    width: 220px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+    border: 1px solid #e5e7eb;
 }
 
-.login-box {
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    width: 300px;
-    margin: 100px auto;
-    text-align: center;
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0,0,0,0.1);
 }
 
-.login-box input {
-    width: 100%;
-    padding: 8px;
+.price {
+    font-size: 1.2rem;
+    color: #059669; /* Verde carino */
+    font-weight: bold;
     margin: 10px 0;
 }
+
+/* ADMIN: Tabella */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden; /* Per i bordi arrotondati */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    text-align: left;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding: 16px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+td {
+    padding: 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+tr:last-child td { border-bottom: none; }
+tr:hover { background-color: #f8fafc; }

@@ -2,25 +2,40 @@
 <html lang="it" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Admin</title>
+    <title>Amministrazione</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
 <header>
-    <h2>Area Admin</h2>
+    <h2>🛡️ Dashboard Admin</h2>
     <form th:action="@{/logout}" method="post">
-        <button>Logout</button>
+        <button style="background: #ef4444;">Logout</button>
     </form>
 </header>
 
 <main>
-    <tr th:each="r : ${rentals}">
-        <td th:text="${r.customerName}"></td>
-        <td th:text="${r.carId}"></td>
-        <td th:text="${r.days}"></td>
-    </tr>
+    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <h3 style="margin-top: 0;">Lista Noleggi Attivi</h3>
 
+        <table>
+            <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Auto Noleggiata</th> <th>Durata (Giorni)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${rentals}">
+                <td th:text="${r.customerName}">Mario Rossi</td>
+                <td th:text="${r.carModel}">Fiat Panda</td> <td th:text="${r.days}">3</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(rentals)}">
+                <td colspan="3" style="text-align: center; color: #999;">Nessun noleggio presente</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </main>
 
 </body>

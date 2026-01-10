@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class ViewController {
@@ -58,8 +60,29 @@ public class ViewController {
     // ADMIN
     @GetMapping("/admin")
     public String adminPage(Model model) {
-        model.addAttribute("rentals", rentalRepository.findAll());
+        // 1. Scarico tutto
+        List<Rental> rentals = rentalRepository.findAll();
+        List<Car> cars = carRepository.findAll();
+
+        // 2. Creo una mappa veloce ID -> "Brand Model"
+        Map<String, String> carMap = cars.stream()
+                .collect(Collectors.toMap(Car::getId, car -> car.getBrand() + " " + car.getModel()));
+
+        // 3. Creo una lista di oggetti "AdminView" che hanno il nome auto leggibile
+        List<AdminRentalView> adminViews = rentals.stream()
+                .map(r -> new AdminRentalView(
+                        r.getCustomerName(),
+                        carMap.getOrDefault(r.getCarId(), "Auto Rimossa"), // Risolvo l'ID
+                        r.getDays()
+                ))
+                .collect(Collectors.toList());
+
+        model.addAttribute("rentals", adminViews);
         return "admin";
     }
+
+    // Record interno per passare i dati alla vista (Solo Java 14+)
+    public record AdminRentalView(String customerName, String carModel, int days) {}
 }
+
 
