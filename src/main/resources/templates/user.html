@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Area Utente</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <h2>Area Utente</h2>
+    <form th:action="@{/logout}" method="post">
+        <button>Logout</button>
+    </form>
+</header>
+
+<main>
+    <div class="card" th:each="car : ${cars}">
+        <h4 th:text="${car.brand + ' ' + car.model}"></h4>
+        <p>€<span th:text="${car.pricePerDay}"></span> / giorno</p>
+
+        <form th:action="@{/rent}" method="post">
+            <input type="hidden" name="carId" th:value="${car.id}">
+            <input type="hidden" name="customerName" value="Mario Rossi">
+            <input type="number" name="days" value="1" min="1">
+            <button>Noleggia</button>
+        </form>
+    </div>
+
+</main>
+
+</body>
+</html>

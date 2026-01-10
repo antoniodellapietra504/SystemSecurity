@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+
+  mongo:
+    image: mongo:7
+    container_name: mongo-car-rental
+    ports:
+      - "27017:27017"
+
+  backend:
+    build: .
+    container_name: spring-car-rental
+    depends_on:
+      - mongo
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/car_rental
+
+  apache:
+    build: ./apache
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend

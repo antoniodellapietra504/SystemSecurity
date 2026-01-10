@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <h2>Area Admin</h2>
+    <form th:action="@{/logout}" method="post">
+        <button>Logout</button>
+    </form>
+</header>
+
+<main>
+    <tr th:each="r : ${rentals}">
+        <td th:text="${r.customerName}"></td>
+        <td th:text="${r.carId}"></td>
+        <td th:text="${r.days}"></td>
+    </tr>
+
+</main>
+
+</body>
+</html>
