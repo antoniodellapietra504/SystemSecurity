@@ -5,8 +5,16 @@ services:
   mongo:
     image: mongo:7
     container_name: mongo-car-rental
-    ports:
-      - "27017:27017"
+
+  postgres_keycloak:
+    image: postgres:15
+    container_name: postgres-keycloak
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_keycloak_data:/var/lib/postgresql/data
 
   backend:
     build: .
@@ -16,6 +24,24 @@ services:
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/car_rental
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.0
+    container_name: keycloak-server
+    command: start-dev 
+    depends_on:
+      - postgres_keycloak
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME_URL: https://localhost
+      KC_HOSTNAME_ADMIN_URL: https://localhost
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres_keycloak:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password
+
   apache:
     build: ./apache
     ports:
@@ -23,3 +49,7 @@ services:
       - "443:443"
     depends_on:
       - backend
+      - keycloak
+
+volumes:
+  postgres_keycloak_data:

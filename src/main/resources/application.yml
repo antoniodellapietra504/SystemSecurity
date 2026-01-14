@@ -1,0 +1,32 @@
+server:
+  forward-headers-strategy: framework
+  port: 8080
+
+spring:
+  application:
+    name: car-rental-backend
+  data:
+    mongodb:
+      uri: mongodb://mongo:27017/car_rental
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: car-rental-client
+            client-secret: "lTtKrgDwgiqqO9KlGMs4ohtXugJ8hUZC"
+            scope: openid, profile, email
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            provider: keycloak-provider
+
+        provider:
+          keycloak-provider:
+            # URL per il backend (rete interna Docker)
+            token-uri: http://keycloak:8080/auth/realms/CarRental/protocol/openid-connect/token
+            jwk-set-uri: http://keycloak:8080/auth/realms/CarRental/protocol/openid-connect/certs
+            # URL per il browser (passa da Apache)
+            authorization-uri: https://localhost/auth/realms/CarRental/protocol/openid-connect/auth
+            user-info-uri: http://keycloak:8080/auth/realms/CarRental/protocol/openid-connect/userinfo
+            user-name-attribute: preferred_username

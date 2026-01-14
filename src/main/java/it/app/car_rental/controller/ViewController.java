@@ -27,8 +27,8 @@ public class ViewController {
 
     // LOGIN
     @GetMapping("/")
-    public String loginPage() {
-        return "index";
+    public String rootPage() {
+        return "redirect:/user";
     }
 
     // UTENTE
