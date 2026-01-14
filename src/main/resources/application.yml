@@ -28,5 +28,4 @@ spring:
             jwk-set-uri: http://keycloak:8080/auth/realms/CarRental/protocol/openid-connect/certs
             # URL per il browser (passa da Apache)
             authorization-uri: https://localhost/auth/realms/CarRental/protocol/openid-connect/auth
-            user-info-uri: http://keycloak:8080/auth/realms/CarRental/protocol/openid-connect/userinfo
             user-name-attribute: preferred_username

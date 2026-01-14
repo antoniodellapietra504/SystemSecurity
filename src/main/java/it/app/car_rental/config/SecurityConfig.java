@@ -33,9 +33,39 @@ public class SecurityConfig {
     @Bean
     public AuthenticationSuccessHandler myAuthenticationSuccessHandler() {
         return (request, response, authentication) -> {
-            // Per ora mandiamo tutti alla pagina /user per testare che il login funzioni.
-            // Nello step successivo, qui leggeremo i ruoli per smistare Admin vs User.
-            response.sendRedirect("/user");
+            org.springframework.security.oauth2.core.oidc.user.OidcUser oidcUser =
+                    (org.springframework.security.oauth2.core.oidc.user.OidcUser) authentication.getPrincipal();
+
+            // --- INIZIO DEBUG ---
+            System.out.println("\n\n=========================================");
+            System.out.println("DEBUG LOGIN UTENTE: " + oidcUser.getName());
+            System.out.println("TUTTI GLI ATTRIBUTI: " + oidcUser.getAttributes());
+
+            // Cerchiamo realm_access
+            Object realmAccessObj = oidcUser.getAttribute("realm_access");
+            System.out.println("realm_access trovato? " + realmAccessObj);
+            // =========================================\n
+
+            java.util.List<String> roles = new java.util.ArrayList<>();
+
+            // Logica di estrazione sicura
+            if (realmAccessObj instanceof java.util.Map) {
+                java.util.Map<String, Object> realmAccess = (java.util.Map<String, Object>) realmAccessObj;
+                if (realmAccess.containsKey("roles")) {
+                    roles = (java.util.List<String>) realmAccess.get("roles");
+                }
+            }
+
+            System.out.println("RUOLI ESTRATTI: " + roles);
+
+            // Controllo Ruolo (CASE SENSITIVE!)
+            if (roles.contains("admin")) {
+                System.out.println(">>> RILEVATO ADMIN -> Redirect /admin");
+                response.sendRedirect("/admin");
+            } else {
+                System.out.println(">>> NESSUN RUOLO ADMIN -> Redirect /user");
+                response.sendRedirect("/user");
+            }
         };
     }
 }
