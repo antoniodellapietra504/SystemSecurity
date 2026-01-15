@@ -39,7 +39,7 @@ public class ViewController {
         return "user";
     }
 
-    // CREA NOLEGGIO (bottone che FINALMENTE funziona)
+    // CREA NOLEGGIO
     @PostMapping("/rent")
     public String rentCar(
             @RequestParam String customerName,
@@ -57,23 +57,20 @@ public class ViewController {
         return "redirect:/user";
     }
 
-    // ADMIN
+    // ADMIN: Visualizza Tabella
     @GetMapping("/admin")
     public String adminPage(Model model) {
-        // 1. Scarico tutto
         List<Rental> rentals = rentalRepository.findAll();
         List<Car> cars = carRepository.findAll();
 
-        // 2. Creo una mappa veloce ID -> "Brand Model"
         Map<String, String> carMap = cars.stream()
                 .collect(Collectors.toMap(Car::getId, car -> car.getBrand() + " " + car.getModel()));
 
-        // 3. Creo una lista di oggetti "AdminView" che hanno il nome auto leggibile
         List<AdminRentalView> adminViews = rentals.stream()
                 .map(r -> new AdminRentalView(
-                        r.getId(),
+                        r.getId(), // Assicurati che Rental.java abbia getId()
                         r.getCustomerName(),
-                        carMap.getOrDefault(r.getCarId(), "Auto Rimossa"), // Risolvo l'ID
+                        carMap.getOrDefault(r.getCarId(), "Auto Rimossa"),
                         r.getDays()
                 ))
                 .collect(Collectors.toList());
@@ -82,8 +79,13 @@ public class ViewController {
         return "admin";
     }
 
-    // Record interno per passare i dati alla vista (Solo Java 14+)
-    public record AdminRentalView(String Id, String customerName, String carModel, int days) {}
+    // ADMIN
+    @PostMapping("/admin/rentals/delete")
+    public String deleteRental(@RequestParam String id) {
+        rentalRepository.deleteById(id);
+        return "redirect:/admin";
+    }
+
+    // Record aggiornato: "id" minuscolo per Thymeleaf!
+    public record AdminRentalView(String id, String customerName, String carModel, int days) {}
 }
-
-
