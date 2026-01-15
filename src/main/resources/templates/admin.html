@@ -22,16 +22,24 @@
             <thead>
             <tr>
                 <th>Cliente</th>
-                <th>Auto Noleggiata</th> <th>Durata (Giorni)</th>
-            </tr>
+                <th>Auto Noleggiata</th>
+                <th>Durata</th>
+                <th>Azioni</th> </tr>
             </thead>
             <tbody>
             <tr th:each="r : ${rentals}">
                 <td th:text="${r.customerName}">Mario Rossi</td>
-                <td th:text="${r.carModel}">Fiat Panda</td> <td th:text="${r.days}">3</td>
+                <td th:text="${r.carModel}">Fiat Panda</td>
+                <td th:text="${r.days}">3</td>
+                <td>
+                    <form th:action="@{/admin/rentals/delete}" method="post">
+                        <input type="hidden" name="id" th:value="${r.id}">
+                        <button style="background: #dc2626; padding: 5px 10px; font-size: 0.8rem;">Elimina</button>
+                    </form>
+                </td>
             </tr>
             <tr th:if="${#lists.isEmpty(rentals)}">
-                <td colspan="3" style="text-align: center; color: #999;">Nessun noleggio presente</td>
+                <td colspan="4" style="text-align: center; color: #999;">Nessun noleggio presente</td>
             </tr>
             </tbody>
         </table>

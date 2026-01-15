@@ -28,6 +28,12 @@ public class RentalController {
         return rentalRepository.findAll();
     }
 
+    @PostMapping("/admin/rentals/delete")
+    public String deleteRental(@RequestParam String id) {
+        rentalRepository.deleteById(id);
+        return "redirect:/admin";
+    }
+
     @GetMapping("/test-rent")
     public Rental testRent(
             @RequestParam String name,

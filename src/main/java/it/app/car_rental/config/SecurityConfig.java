@@ -23,7 +23,17 @@ public class SecurityConfig {
                         .successHandler(myAuthenticationSuccessHandler())
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("https://localhost/auth/realms/CarRental/protocol/openid-connect/logout?redirect_uri=https://localhost")
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            String logoutUrl = "https://localhost/auth/realms/CarRental/protocol/openid-connect/logout" +
+                                    "?client_id=car-rental-client" +
+                                    "&post_logout_redirect_uri=https://localhost";
+
+                            response.sendRedirect(logoutUrl);
+                        })
+                        .invalidateHttpSession(true) // Cancella sessione Java
+                        .clearAuthentication(true)   // Pulisce dati utente
+                        .deleteCookies("JSESSIONID") // Cancella il cookie
                 );
 
         return http.build();

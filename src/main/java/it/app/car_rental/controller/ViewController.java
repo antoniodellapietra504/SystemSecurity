@@ -71,6 +71,7 @@ public class ViewController {
         // 3. Creo una lista di oggetti "AdminView" che hanno il nome auto leggibile
         List<AdminRentalView> adminViews = rentals.stream()
                 .map(r -> new AdminRentalView(
+                        r.getId(),
                         r.getCustomerName(),
                         carMap.getOrDefault(r.getCarId(), "Auto Rimossa"), // Risolvo l'ID
                         r.getDays()
@@ -82,7 +83,7 @@ public class ViewController {
     }
 
     // Record interno per passare i dati alla vista (Solo Java 14+)
-    public record AdminRentalView(String customerName, String carModel, int days) {}
+    public record AdminRentalView(String Id, String customerName, String carModel, int days) {}
 }
 
 
