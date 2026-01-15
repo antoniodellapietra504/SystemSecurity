@@ -7,19 +7,34 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import java.util.List;
+import java.util.Map;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final KeycloakPep keycloakPep;
+
+    // Iniettiamo il nostro "Vigile" (il PEP che hai creato prima)
+    public SecurityConfig(KeycloakPep keycloakPep) {
+        this.keycloakPep = keycloakPep;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Per semplicità nei test
+                .csrf(csrf -> csrf.disable()) // Disabilitato per semplicità
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/images/**").permitAll() // Risorse statiche pubbliche
-                        .anyRequest().authenticated() // Tutto il resto richiede login
+                        // 1. Risorse pubbliche: Queste passano SENZA chiedere al PEP (per evitare loop)
+                        .requestMatchers("/css/**", "/images/**", "/login**", "/logout**", "/error").permitAll()
+
+                        // 2. TUTTO IL RESTO: Passa dal PEP Puro
+                        // Spring ferma la richiesta e chiama keycloakPep.check()
+                        .anyRequest().access(keycloakPep)
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        // Usiamo un handler personalizzato per decidere dove mandare l'utente dopo il login
+                        // Appena fai login, decidiamo dove mandarti (User -> /user, Admin -> /admin)
                         .successHandler(myAuthenticationSuccessHandler())
                 )
                 .logout(logout -> logout
@@ -28,52 +43,38 @@ public class SecurityConfig {
                             String logoutUrl = "https://localhost/auth/realms/CarRental/protocol/openid-connect/logout" +
                                     "?client_id=car-rental-client" +
                                     "&post_logout_redirect_uri=https://localhost";
-
                             response.sendRedirect(logoutUrl);
                         })
-                        .invalidateHttpSession(true) // Cancella sessione Java
-                        .clearAuthentication(true)   // Pulisce dati utente
-                        .deleteCookies("JSESSIONID") // Cancella il cookie
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID")
                 );
 
         return http.build();
     }
 
-    // Logica di reindirizzamento post-login
+    // Gestore del "Dopo Login": Smista l'utente nella sua home page corretta
     @Bean
     public AuthenticationSuccessHandler myAuthenticationSuccessHandler() {
         return (request, response, authentication) -> {
             org.springframework.security.oauth2.core.oidc.user.OidcUser oidcUser =
                     (org.springframework.security.oauth2.core.oidc.user.OidcUser) authentication.getPrincipal();
 
-            // --- INIZIO DEBUG ---
-            System.out.println("\n\n=========================================");
-            System.out.println("DEBUG LOGIN UTENTE: " + oidcUser.getName());
-            System.out.println("TUTTI GLI ATTRIBUTI: " + oidcUser.getAttributes());
-
-            // Cerchiamo realm_access
             Object realmAccessObj = oidcUser.getAttribute("realm_access");
-            System.out.println("realm_access trovato? " + realmAccessObj);
-            // =========================================\n
+            List<String> roles = new java.util.ArrayList<>();
 
-            java.util.List<String> roles = new java.util.ArrayList<>();
-
-            // Logica di estrazione sicura
-            if (realmAccessObj instanceof java.util.Map) {
-                java.util.Map<String, Object> realmAccess = (java.util.Map<String, Object>) realmAccessObj;
+            if (realmAccessObj instanceof Map) {
+                Map<String, Object> realmAccess = (Map<String, Object>) realmAccessObj;
                 if (realmAccess.containsKey("roles")) {
-                    roles = (java.util.List<String>) realmAccess.get("roles");
+                    roles = (List<String>) realmAccess.get("roles");
                 }
             }
 
-            System.out.println("RUOLI ESTRATTI: " + roles);
-
-            // Controllo Ruolo (CASE SENSITIVE!)
+            // Se è admin, lo mandiamo alla dashboard. Se è user, alla home.
+            // NOTA: Se un Admin prova ad andare su /user (o viceversa), sarà il PEP a bloccarlo dopo il redirect.
             if (roles.contains("admin")) {
-                System.out.println(">>> RILEVATO ADMIN -> Redirect /admin");
                 response.sendRedirect("/admin");
             } else {
-                System.out.println(">>> NESSUN RUOLO ADMIN -> Redirect /user");
                 response.sendRedirect("/user");
             }
         };

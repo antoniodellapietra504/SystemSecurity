@@ -21,13 +21,20 @@ services:
     container_name: spring-car-rental
     depends_on:
       - mongo
+    # 1. AGGIUNGI QUESTO: Mappa localhost all'IP del tuo computer host
+    extra_hosts:
+      - "localhost:host-gateway"
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/car_rental
+      # 2. MODIFICA QUESTO: Il backend deve chiamare l'indirizzo PUBBLICO, non quello interno
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_TOKEN_URI: https://localhost/auth/realms/CarRental/protocol/openid-connect/token
+      # Assicurati che il client-secret sia quello giusto
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENT_SECRET: lTtKrgDwgiqqO9KlGMs4ohtXugJ8hUZC
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.0
     container_name: keycloak-server
-    command: start-dev 
+    command: start-dev
     depends_on:
       - postgres_keycloak
     environment:
