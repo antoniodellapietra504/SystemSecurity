@@ -21,13 +21,14 @@ services:
     container_name: spring-car-rental
     depends_on:
       - mongo
-    # 1. AGGIUNGI QUESTO: Mappa localhost all'IP del tuo computer host
     extra_hosts:
       - "localhost:host-gateway"
     environment:
      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_TOKEN_URI: http://keycloak:8080/auth/realms/CarRental/protocol/openid-connect/token
-
-     SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENT_SECRET: pJ6QlU09qYUu8rB4G0XRLmDUbnqoZKqm
+     #SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENT_SECRET: pJ6QlU09qYUu8rB4G0XRLmDUbnqoZKqm
+     SPRING_CLOUD_VAULT_URI: http://vault-server:8200
+     SPRING_CLOUD_VAULT_TOKEN: hvs.CAESIHt8QgWmG6V9H7Wcu5OZUzMIH0Tu7wB_PMxbF49DCqKOGh4KHGh2cy5qRXBZOHdyUDNVWFF0YnVvNjBBTWFxY2U
+     SPRING_CLOUD_VAULT_KV_ENABLED: "true"
 
 
 
@@ -48,6 +49,24 @@ services:
       KC_DB_URL: jdbc:postgresql://postgres_keycloak:5432/keycloak
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD: password
+
+  vault:
+    image: hashicorp/vault:1.15
+    container_name: vault-server
+    restart: unless-stopped
+    ports:
+      - "8200:8200"
+    volumes:
+      - ./vault/config:/vault/config
+      - ./vault/data:/vault/file
+      - ./vault/logs:/vault/logs
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_ADDR: 'http://127.0.0.1:8200'
+    command: server
+    depends_on:
+      - keycloak
 
   apache:
     build: ./apache
